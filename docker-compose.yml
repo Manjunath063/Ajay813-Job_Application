@@ -1,0 +1,74 @@
+version: '3.8'
+
+services:
+  backend:
+    container_name: ajay813_backend
+    build: ./Backend
+    ports:
+      - "3073:3073"
+    environment:
+      - PORT=3073
+      - DB_USER=postgres
+      - DB_PASSWORD=admin123
+      - DB_NAME=new_employee_db
+      - PG_HOST=postgres
+      - DB_PORT=5432
+    depends_on:
+      - postgres
+    networks:
+      - ajay813_net
+    volumes:
+      - ./Backend/uploads:/app/Uploads
+
+  frontend:
+    container_name: ajay813_frontend
+    build: ./Frontend
+    ports:
+      - "8134:80"
+    depends_on:
+      - backend
+    networks:
+      - ajay813_net
+
+  hr_page:
+    container_name: ajay813_hr
+    build: ./HR_Page
+    ports:
+      - "8135:80"
+    depends_on:
+      - backend
+    networks:
+      - ajay813_net
+
+  offerletter:
+    container_name: ajay813_offerletter
+    build: ./offerletter
+    ports:
+      - "8136:80"
+    depends_on:
+      - backend
+    networks:
+      - ajay813_net
+
+  postgres:
+    container_name: ajay813_postgres
+    image: postgres:13
+    ports:
+      - "5473:5432"
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=admin123
+      - POSTGRES_DB=new_employee_db
+    volumes:
+      - pgdata813:/var/lib/postgresql/data
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - ajay813_net
+
+volumes:
+  pgdata813:
+
+networks:
+  ajay813_net:
+    driver: bridge
+
